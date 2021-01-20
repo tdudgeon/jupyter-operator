@@ -1,15 +1,15 @@
 # Jupyter Operator
 
 This repo is an experiment to create a simple Kubernetes (K8S) Operator that can be used to create
-Jupyter Notebooks within  a K8S cluster. It is heavily basede on work from @GrapahmDumpleton that 
-can be found [here](https://github.com/jupyter-on-kubernetes/lab-jupyter-on-k8s-02). That involves
-running an operator within his [EduKates](https://github.com/eduk8s/eduk8s) environment already 
-running in the cluster.
+Jupyter Notebooks within  a K8S cluster. It is heavily baseed on work from @GrahamDumpleton that 
+can be found [here](https://github.com/jupyter-on-kubernetes/lab-jupyter-on-k8s-02).
+That involves running an operator within his [EduKates](https://github.com/eduk8s/eduk8s) 
+environment already running in the cluster.
 
 What this repo is trying to do is pull out only what is essential for deploying ONLY the Jupyter operator
 to the cluster.
 
-**NOTE** this work is preliminary and far from fully functional.
+**NOTE**: this work is preliminary and far from fully functional.
 
 ## My environment
 
@@ -22,7 +22,7 @@ Minukube  with these addons enabled:
 Python 3.9.1 with kopf and kubernetes installed with Pip.
 I use a Conda environment.
 
-## Deployment of the Operator
+## Deployment Steps
 
 ### Deploy the CRD
 
@@ -51,7 +51,14 @@ jupyternotebook.jupyter-on-kubernetes.test/notebook created
 ```
 
 This corresponds to notebook-2 in the jupyter-on-kubernetes/lab-jupyter-on-k8s-02 repo.
-It deploys a very basic notbook environment.
+It deploys a very basic notebook environment.
+
+In the kopf logs you see this:
+```
+[2021-01-20 16:12:42,393] kopf.objects         [INFO    ] [default/notebook] Handler 'jupyter' succeeded.
+[2021-01-20 16:12:42,393] kopf.objects         [INFO    ] [default/notebook] Creation event is processed: 1 succeeded; 0 failed.
+[2021-01-20 16:12:42,404] kopf.objects         [WARNING ] [default/notebook] Patching failed with inconsistencies: (('remove', ('status', 'jupyter'), {'notebook': {'url': 'http://notebook-default.192.168.49.2.nip.io', 'password': 'pnzUN2HxZLF9fk5S', 'interface': 'lab'}, 'deployment': {'image': 'jupyter/minimal-notebook:latest', 'serviceAccountName': 'default', 'resources': {'requests': {'memory': '512Mi', 'storage': ''}, 'limits': {'memory': '512Mi', 'storage': ''}}}, 'storage': {'claimName': '', 'subPath': ''}}, None),)
+```
 
 Check what has been created:
 ```
@@ -59,7 +66,7 @@ $ kubectl get jupyternotebooks.jupyter-on-kubernetes.test
 NAME       URL   PASSWORD
 notebook         
 ```
-Note that the URL and PASSWORD fields are not filled, but the notebook CRD is present.
+Note that the URL and PASSWORD fields are not filled, but the notebook CRD is present. See #1.
 
 See what the Operator has created:
 ```
