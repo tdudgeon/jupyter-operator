@@ -101,8 +101,8 @@ customresourcedefinition.apiextensions.k8s.io "jupyternotebooks.jupyter-on-kuber
 
 Lots of remaining work. In the immediate term:
 
-1. Figure out why the URL and PASSWORD fields are not filled in the output of the CRD.
-2. Build container for the operator.
-3. Determine what RBAC is need for the ServiceAccount when running the operator container.
-4. Review the [CRD definintion](crd.yaml) which was hacked together from what the workshop deployment provided.
+1. Figure out why the URL and PASSWORD fields are not filled in the output of the CRD. (#1)
+2. Review the [CRD definintion](crd.yaml) which was hacked together from what the workshop deployment provided. (#2)
+3. Build container for the operator.
+4. Determine what RBAC is need for the ServiceAccount when running the operator container.
 
