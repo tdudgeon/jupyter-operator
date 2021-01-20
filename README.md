@@ -1,10 +1,7 @@
 # Jupyter Operator
 
 This repo is an experiment to create a simple Kubernetes (K8S) Operator that can be used to create
-Jupyter Notebooks within  a K8S cluster. It is heavily baseed on work from @GrahamDumpleton that 
-can be found [here](https://github.com/jupyter-on-kubernetes/lab-jupyter-on-k8s-02).
-That involves running an operator within his [EduKates](https://github.com/eduk8s/eduk8s) 
-environment already running in the cluster.
+Jupyter Notebooks within  a K8S cluster.
 
 What this repo is trying to do is pull out only what is essential for deploying ONLY the Jupyter operator
 to the cluster.
