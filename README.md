@@ -33,6 +33,11 @@ $ kubectl create -f crd.yaml
 ### Run the operator
 
 For testing the operator is run manually from Python.
+This needs the INGRESS_DOMAIN environment variable to be set to the base domain name for the K8S cluster:
+```
+export INGRESS_DOMAIN=192.168.49.2.nip.io
+```
+
 ```
 $ kopf run handlers.py 
 [2021-01-20 16:31:09,827] kopf.reactor.activit [INFO    ] Initial authentication has been initiated.
