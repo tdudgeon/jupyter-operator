@@ -1,4 +1,4 @@
-apiVersion: jupyter-on-kubernetes.test/v1alpha1
+apiVersion: squonk.it/v1alpha1
 kind: JupyterNotebook
 metadata:
   name: notebook

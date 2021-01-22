@@ -36,7 +36,7 @@ EOF
 fi
 """
 
-@kopf.on.create("jupyter-on-kubernetes.test", "v1alpha1", "jupyternotebooks", id="jupyter")
+@kopf.on.create("squonk.it", "v1alpha1", "jupyternotebooks")
 def create(name, uid, namespace, spec, logger, **_):
     algorithm = "sha1"
     salt_len = 12
@@ -305,7 +305,7 @@ def create(name, uid, namespace, spec, logger, **_):
     }
     
 
-@kopf.on.delete("jupyter-on-kubernetes.test", "v1alpha1", "jupyternotebooks", id="jupyter") 
+@kopf.on.delete("squonk.it", "v1alpha1", "jupyternotebooks") 
 def delete(body, **kwargs): 
     msg = f"Jupyter notebook {body['metadata']['name']} and its Pod/Service/Ingress children deleted"
     return {'message': msg}
