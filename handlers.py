@@ -157,7 +157,7 @@ def create(name, uid, namespace, spec, logger, **_):
     storage_limit = ""
 
     storage_claim_name = spec.get("storage", {}).get("claimName", "")
-    storage_sub_path = spec.get("storage", {}).get("claimName", "")
+    storage_sub_path = spec.get("storage", {}).get("subPath", "")
 
     if not storage_claim_name:
         storage_request = spec.get("deployment", {}).get("resources", {}).get("requests", {}).get("storage", "")
@@ -201,7 +201,9 @@ def create(name, uid, namespace, spec, logger, **_):
         volume = {"name": "data", "persistentVolumeClaim": {"claimName": storage_claim_name}}
         deployment_body["spec"]["template"]["spec"]["volumes"].append(volume)
 
-        storage_mount = {"name": "data", "mountPath": "/home/jovyan", "subPath": storage_sub_path}
+        storage_mount = {"name": "data", "mountPath": "/home/jovyan"}
+        if storage_sub_path:
+        	storage_mount["subPath"] = storage_sub_path
         deployment_body["spec"]["template"]["spec"]["containers"][0]["volumeMounts"].append(storage_mount)
 
     kopf.adopt(deployment_body)

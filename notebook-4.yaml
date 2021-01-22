@@ -1,0 +1,8 @@
+apiVersion: squonk.it/v1alpha1
+kind: JupyterNotebook
+metadata:
+  name: notebook
+spec:
+  storage:
+    claimName: workspaces
+    subPath: workspace-1
