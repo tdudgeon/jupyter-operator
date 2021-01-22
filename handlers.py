@@ -304,4 +304,9 @@ def create(name, uid, namespace, spec, logger, **_):
         }
     }
     
-    
+
+@kopf.on.delete("jupyter-on-kubernetes.test", "v1alpha1", "jupyternotebooks", id="jupyter") 
+def delete(body, **kwargs): 
+    msg = f"Jupyter notebook {body['metadata']['name']} and its Pod/Service/Ingress children deleted"
+    return {'message': msg}
+
