@@ -52,8 +52,7 @@ $ kubectl create -f notebook-2.yaml
 jupyternotebook.jupyter-on-kubernetes.test/notebook created
 ```
 
-This corresponds to notebook-2 in the jupyter-on-kubernetes/lab-jupyter-on-k8s-02 repo.
-It deploys a very basic notebook environment.
+This deploys a very basic notebook environment. notebook-3 and notebook-4 illustrate other options.
 
 In the kopf logs you see this:
 ```
@@ -64,7 +63,7 @@ In the kopf logs you see this:
 
 Check what has been created:
 ```
-$ kubectl get jupyternotebooks.jupyter-on-kubernetes.test
+$ kubectl get jupyternotebooks.squonk.it
 NAME       URL   PASSWORD
 notebook         
 ```
@@ -90,20 +89,20 @@ NAME                          CLASS    HOSTS                                  AD
 ingress.extensions/notebook   <none>   notebook-default.192.168.49.2.nip.io   192.168.49.2   80        3m4s
 ```
 
-Access the notebook at http://notebook-default.192.168.49.2.nip.io. When the page opens use the password
+Access the notebook at the URL listed for the ingress. When the page opens use the password
 shown in the kopf logs. It works!
 
 ### Delete the notebook
 ```
-$ kubectl delete jupyternotebooks.jupyter-on-kubernetes.test/notebook
-jupyternotebook.jupyter-on-kubernetes.test "notebook" deleted
+$ kubectl delete jupyternotebooks.squonk.it/notebook
+jupyternotebook.squonk.it "notebook" deleted
 ```
 
 
 ### Delete the CRD
 ```
-$ kubectl delete crd/jupyternotebooks.jupyter-on-kubernetes.test
-customresourcedefinition.apiextensions.k8s.io "jupyternotebooks.jupyter-on-kubernetes.test" deleted
+$ kubectl delete crd/jupyternotebooks.squonk.it
+customresourcedefinition.apiextensions.k8s.io "jupyternotebooks.squonk.it" deleted
 ```
 
 # TODO
