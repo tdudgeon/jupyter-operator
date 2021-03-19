@@ -29,27 +29,19 @@ if [ ! -f $HOME/.jupyter/jupyter_notebook_config.json ]; then
     cat > $HOME/.jupyter/jupyter_notebook_config.json << EOF
 {
   "NotebookApp": {
-    "password": "%(password_hash)s"
+    "token": "%(token)s"
   }
 }
 EOF
 fi
 """
 
-@kopf.on.create("squonk.it", "v1alpha1", "jupyternotebooks")
+@kopf.on.create("squonk.it", "v1alpha1", "jupyternotebooks", id="jupyter")
 def create(name, uid, namespace, spec, logger, **_):
-    algorithm = "sha1"
-    salt_len = 12
 
     characters = string.ascii_letters + string.digits
-    password = "".join(random.sample(characters, 16))
+    token = "".join(random.sample(characters, 16))
 
-    h = hashlib.new(algorithm)
-    salt = ("%0" + str(salt_len) + "x") % random.getrandbits(4 * salt_len)
-    h.update(bytes(password, "utf-8") + salt.encode("ascii"))
-
-    password_hash = ":".join((algorithm, salt, h.hexdigest()))
-    
     config_map_body = {
         "apiVersion": "v1",
         "kind": "ConfigMap",
@@ -60,7 +52,7 @@ def create(name, uid, namespace, spec, logger, **_):
             }
         },
         "data": {
-            "setup-environment.sh": notebook_startup % dict(password_hash=password_hash)
+            "setup-environment.sh": notebook_startup % dict(token=token)
         }
     }
 
@@ -68,6 +60,7 @@ def create(name, uid, namespace, spec, logger, **_):
 
     core_api = kubernetes.client.CoreV1Api()
     core_api.create_namespaced_config_map(namespace, config_map_body)
+    logger.debug("Created configmap")
     
     notebook_interface = spec.get("notebook", {}).get("interface", "lab")
 
@@ -196,6 +189,7 @@ def create(name, uid, namespace, spec, logger, **_):
             kopf.adopt(persistent_volume_claim_body)
 
             core_api.create_namespaced_persistent_volume_claim(namespace, persistent_volume_claim_body)
+            logger.debug("Created pvc")
 
     else:
         volume = {"name": "data", "persistentVolumeClaim": {"claimName": storage_claim_name}}
@@ -203,13 +197,14 @@ def create(name, uid, namespace, spec, logger, **_):
 
         storage_mount = {"name": "data", "mountPath": "/home/jovyan"}
         if storage_sub_path:
-        	storage_mount["subPath"] = storage_sub_path
+            storage_mount["subPath"] = storage_sub_path
         deployment_body["spec"]["template"]["spec"]["containers"][0]["volumeMounts"].append(storage_mount)
 
     kopf.adopt(deployment_body)
 
     apps_api = kubernetes.client.AppsV1Api()
     apps_api.create_namespaced_deployment(namespace, deployment_body)
+    logger.debug("Created deployment")
 
     service_body = {
         "apiVersion": "v1",
@@ -239,6 +234,7 @@ def create(name, uid, namespace, spec, logger, **_):
     kopf.adopt(service_body)
 
     core_api.create_namespaced_service(namespace, service_body)
+    logger.debug("Created service")
 
     ingress_domain = os.environ.get("INGRESS_DOMAIN")
     ingress_hostname = f"notebook-{namespace}.{ingress_domain}"
@@ -279,13 +275,15 @@ def create(name, uid, namespace, spec, logger, **_):
 
     ext_api = kubernetes.client.ExtensionsV1beta1Api()
     ext_api.create_namespaced_ingress(namespace, ingress_body)
+    logger.debug("Created ingress")
 
     return {
-        "notebook" : {
-            "url": f"http://{ingress_hostname}",
-            "password": password,
+        "notebook": {
+            "url": f"http://{ingress_hostname}/?token={token}",
+            "token": token,
             "interface": notebook_interface,
-        },
+        }
+        ,
         "deployment": {
             "image": image,
             "serviceAccountName": service_account,
@@ -305,9 +303,9 @@ def create(name, uid, namespace, spec, logger, **_):
             "subPath": storage_sub_path
         }
     }
-    
 
-@kopf.on.delete("squonk.it", "v1alpha1", "jupyternotebooks") 
+
+@kopf.on.delete("squonk.it", "v1alpha1", "jupyternotebooks")
 def delete(body, **kwargs): 
     msg = f"Jupyter notebook {body['metadata']['name']} and its Pod/Service/Ingress children deleted"
     return {'message': msg}

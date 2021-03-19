@@ -18,9 +18,9 @@ spec:
       jsonPath: .status.jupyter.notebook.url
       name: URL
       type: string
-    - description: Password for accessing the Jupyter notebook.
-      jsonPath: .status.jupyter.notebook.password
-      name: Password
+    - description: Token for accessing the Jupyter notebook.
+      jsonPath: .status.jupyter.notebook.token
+      name: Token
       type: string
     name: v1alpha1
     schema:
@@ -67,6 +67,7 @@ spec:
             type: object
           status:
             type: object
+            x-kubernetes-preserve-unknown-fields: true
         type: object
     served: true
     storage: true

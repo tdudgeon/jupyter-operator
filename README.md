@@ -58,16 +58,14 @@ In the kopf logs you see this:
 ```
 [2021-01-20 16:12:42,393] kopf.objects         [INFO    ] [default/notebook] Handler 'jupyter' succeeded.
 [2021-01-20 16:12:42,393] kopf.objects         [INFO    ] [default/notebook] Creation event is processed: 1 succeeded; 0 failed.
-[2021-01-20 16:12:42,404] kopf.objects         [WARNING ] [default/notebook] Patching failed with inconsistencies: (('remove', ('status', 'jupyter'), {'notebook': {'url': 'http://notebook-default.192.168.49.2.nip.io', 'password': 'pnzUN2HxZLF9fk5S', 'interface': 'lab'}, 'deployment': {'image': 'jupyter/minimal-notebook:latest', 'serviceAccountName': 'default', 'resources': {'requests': {'memory': '512Mi', 'storage': ''}, 'limits': {'memory': '512Mi', 'storage': ''}}}, 'storage': {'claimName': '', 'subPath': ''}}, None),)
 ```
 
 Check what has been created:
 ```
 $ kubectl get jupyternotebooks.squonk.it
 NAME       URL   PASSWORD
-notebook         
+notebook   http://notebook-default.192.168.49.2.nip.io/?token=CWM8PsfayLpd1qFj   CWM8PsfayLpd1qFj      
 ```
-Note that the URL and PASSWORD fields are not filled, but the notebook CRD is present. See #1.
 
 See what the Operator has created:
 ```
@@ -89,8 +87,7 @@ NAME                          CLASS    HOSTS                                  AD
 ingress.extensions/notebook   <none>   notebook-default.192.168.49.2.nip.io   192.168.49.2   80        3m4s
 ```
 
-Access the notebook at the URL listed for the ingress. When the page opens use the password
-shown in the kopf logs. It works!
+Access the notebook at the URL listed (including the token). It works!
 
 ### Delete the notebook
 ```
@@ -109,8 +106,7 @@ customresourcedefinition.apiextensions.k8s.io "jupyternotebooks.squonk.it" delet
 
 Lots of remaining work. In the immediate term:
 
-1. Figure out why the URL and PASSWORD fields are not filled in the output of the CRD. (#1)
-2. Review the [CRD definintion](crd.yaml) which was hacked together from what the workshop deployment provided. (#2)
-3. Build container for the operator.
-4. Determine what RBAC is need for the ServiceAccount when running the operator container.
+1. Review the [CRD definintion](crd.yaml) which was hacked together from what the workshop deployment provided. (#2)
+1. Build container for the operator.
+1. Determine what RBAC is need for the ServiceAccount when running the operator container.
 
