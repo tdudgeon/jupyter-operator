@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jupyternotebooks-operator
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      application: jupyternotebooks-operator
+  template:
+    metadata:
+      labels:
+        application: jupyternotebooks-operator
+    spec:
+      serviceAccountName: jupyternotebooks-account
+      containers:
+        - name: jupyternotebooks-operator
+          image: tdudgeon/jupyter-operator
+          env:
+            - name: INGRESS_DOMAIN
+              value: 192.168.49.2.nip.io
