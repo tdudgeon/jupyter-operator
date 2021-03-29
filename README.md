@@ -102,11 +102,59 @@ $ kubectl delete crd/jupyternotebooks.squonk.it
 customresourcedefinition.apiextensions.k8s.io "jupyternotebooks.squonk.it" deleted
 ```
 
+# Deployment
+The container image was created like this:
+**Build the container image**
+```
+docker build -t tdudgeon/jupyter-operator .
+```
+**Push the container image**
+```
+docker push tdudgeon/jupyter-operator .
+```
+
+## Deploy the operator as a container
+
+Note that this deployment is very basic and assumes you are working in the `default` namespace.
+
+The RBAC settings (the rbac.yaml file), are preliminary. They appear to work but may not cover all options and may be
+more permissive than are needed. To apply them run:
+```
+kubectl create -f rbac.yaml
+```
+Prior to getting these to work a service account with all privileges granted was created like this:
+```
+kubectl create sa jupyternotebooks-account
+kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=default:jupyternotebooks-account
+```
+This should now not be necessary as using RBAC will be more secure.
+
+Now create the deployment of the operator:
+```
+kubectl create -f deployment.yaml 
+```
+Find the pod and look the logs for any errors.
+You should see something like this:
+```
+/usr/local/lib/python3.9/site-packages/kopf/reactor/running.py:168: FutureWarning: Absence of either namespaces or cluster-wide flag will become an error soon. For now, switching to the cluster-wide mode for backward compatibility.
+  warnings.warn("Absence of either namespaces or cluster-wide flag will become an error soon."
+[2021-03-29 11:45:53,650] kopf.reactor.activit [INFO    ] Initial authentication has been initiated.
+[2021-03-29 11:45:53,651] kopf.activities.auth [DEBUG   ] Activity 'login_via_client' is invoked.
+[2021-03-29 11:45:53,652] kopf.activities.auth [DEBUG   ] Client is configured in cluster with service account.
+[2021-03-29 11:45:53,653] kopf.activities.auth [INFO    ] Activity 'login_via_client' succeeded.
+[2021-03-29 11:45:53,653] kopf.reactor.activit [INFO    ] Initial authentication has finished.
+[2021-03-29 11:45:54,057] kopf.clients.watchin [DEBUG   ] Starting the watch-stream for customresourcedefinitions.v1.apiextensions.k8s.io cluster-wide.
+[2021-03-29 11:45:54,082] kopf.clients.watchin [DEBUG   ] Starting the watch-stream for jupyternotebooks.v1alpha1.squonk.it cluster-wide.
+```
+
+Now you can create a notebook like this:
+```
+kubectl create -f notebook-2.yaml
+```
+
 # TODO
 
 Lots of remaining work. In the immediate term:
 
 1. Review the [CRD definintion](crd.yaml) which was hacked together from what the workshop deployment provided. (#2)
-1. Build container for the operator.
-1. Determine what RBAC is need for the ServiceAccount when running the operator container.
-
+1. Review the [RBAC](rbac.yaml) that is need for the ServiceAccount when running the operator container. (#4)
